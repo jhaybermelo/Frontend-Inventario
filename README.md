@@ -1,73 +1,72 @@
-# React + TypeScript + Vite
+# Frontend-Inventario
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interfaz web del sistema de facturación e inventario. Construida con **React 19**, **TypeScript** y **Vite**.
 
-Currently, two official plugins are available:
+Consume la API del repositorio [Backend-Inventario](https://github.com/jhaybermelo/Backend-Inventario).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Funcionalidades
 
-## React Compiler
+- Inicio de sesión y rutas protegidas
+- Punto de venta (POS) con lector de código de barras (cámara o escáner)
+- Inventario y formulario de productos
+- Historial de ventas, clientes y créditos
+- Compras y caja
+- Reportes con gráficos y descarga de PDF/Word
+- Usuarios, configuración del negocio y registro de notificaciones
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tecnologías
 
-## Expanding the ESLint configuration
+React Router, TanStack Query, React Hook Form + Zod, Axios, Tailwind CSS 4, Chart.js, ZXing.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Requisitos
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js 22+
+- El backend corriendo en `http://localhost:8000`
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Desarrollo
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```powershell
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Abre http://localhost:5173. El servidor de Vite redirige `/api` y `/uploads` a `http://localhost:8000` (ver [vite.config.ts](vite.config.ts)), así que en desarrollo no hay problemas de CORS.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Comando | Qué hace |
+|---|---|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Comprueba tipos y genera `dist/` |
+| `npm run preview` | Sirve el build localmente |
+| `npm run lint` | Ejecuta ESLint |
+
+## Ejecución con Docker
+
+Copia `.env.example` a `.env`. Las variables son:
+
+| Variable | Descripción |
+|---|---|
+| `FRONTEND_PORT` | Puerto expuesto en tu máquina (por defecto 80) |
+| `BACKEND_URL` | Dirección a la que Nginx redirige `/api` y `/uploads` |
+
+El frontend se une a la red Docker `facturacion-net`, que crea el `docker-compose.yml` del backend. **Levanta primero el backend**:
+
+```powershell
+docker compose up -d --build
+```
+
+Abre http://localhost. Para apuntar a otro backend, cambia `BACKEND_URL` y vuelve a levantar; no hace falta tocar el código.
+
+## Estructura
+
+```
+src/
+  api/          cliente Axios y un módulo por recurso
+  components/   Layout, ProtectedRoute y componentes de UI
+  context/      AuthContext (sesión)
+  hooks/        useBarcodeScanner
+  pages/        pantallas de la aplicación
+  types/        tipos TypeScript
+nginx/          plantilla de Nginx usada en Docker
 ```
